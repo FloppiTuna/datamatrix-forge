@@ -12,6 +12,8 @@ import xyz.meowricles.datamatrix.items.media.CompactDiscItem;
 
 import java.nio.charset.StandardCharsets;
 
+
+@SuppressWarnings("unused") // the bulk of the unused warnings hare are just lua methods rlly
 public class CDPlayerPeripheral implements GenericPeripheral {
     @Override
     public String id() {

@@ -5,8 +5,6 @@ import software.bernie.geckolib.model.GeoModel;
 import xyz.meowricles.datamatrix.Datamatrix;
 import xyz.meowricles.datamatrix.blocks.entity.CDPlayerEntity;
 
-import javax.xml.crypto.Data;
-
 public class CDPlayerModel extends GeoModel<CDPlayerEntity> {
     @Override
     public ResourceLocation getModelResource(CDPlayerEntity cdPlayerEntity) {
