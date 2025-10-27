@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
@@ -22,16 +23,18 @@ import software.bernie.geckolib.util.RenderUtils;
 
 public class CDPlayerEntity extends BlockEntity implements GeoBlockEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-    private ItemStack discStack;
+    private ItemStack discStack = ItemStack.EMPTY;
     private boolean trayOpen = false;
 
     public CDPlayerEntity(BlockPos p_155229_, BlockState p_155230_) {
         super(ModBlockEntities.CD_PLAYER_ENTITY.get(), p_155229_, p_155230_);
+
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
     // logic crap
     public boolean hasDisc() {
-        return discStack != null;
+        return !discStack.isEmpty();
     }
 
     public ItemStack getDisc() {
@@ -44,7 +47,7 @@ public class CDPlayerEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void ejectDisc() {
-        this.discStack = null;
+        this.discStack = ItemStack.EMPTY;
         setChanged();
     }
 
@@ -55,34 +58,17 @@ public class CDPlayerEntity extends BlockEntity implements GeoBlockEntity {
     public void setTrayOpen(boolean trayOpen) {
         this.trayOpen = trayOpen;
         setChanged();
-
-        System.out.println("Tray set to: " + trayOpen + " hasDisc=" + hasDisc());
-
-        if (level != null) {
-            System.out.println("running animations");
-            if (trayOpen) {
-                if (hasDisc()) {
-                    this.triggerAnim("controller", "open_disk");
-                } else {
-                    this.triggerAnim("controller", "open");
-                }
-            } else {
-                if (hasDisc()) {
-                    this.triggerAnim("controller", "close_disk");
-                } else {
-                    this.triggerAnim("controller", "close");
-                }
-            }
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
+
+        System.out.println("trayOpen=" + trayOpen + " hasDisc=" + hasDisc());
     }
 
-    public void playPressed() {
-        this.triggerAnim("controller", "play");
-    }
-
+    @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        if (hasDisc()) {
+        if (!discStack.isEmpty()) {
             tag.put("disc", discStack.save(new CompoundTag()));
         }
         tag.putBoolean("trayOpen", trayOpen);
@@ -93,9 +79,12 @@ public class CDPlayerEntity extends BlockEntity implements GeoBlockEntity {
         super.load(tag);
         if (tag.contains("disc")) {
             discStack = ItemStack.of(tag.getCompound("disc"));
+        } else {
+            discStack = ItemStack.EMPTY;
         }
         trayOpen = tag.getBoolean("trayOpen");
     }
+
 
 
     // animation crap
@@ -103,21 +92,26 @@ public class CDPlayerEntity extends BlockEntity implements GeoBlockEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(
                 new AnimationController<>(this, "controller", 0, this::predicate)
-                        .triggerableAnim("open", RawAnimation.begin().thenPlay("open"))
-                        .triggerableAnim("close", RawAnimation.begin().thenPlay("close"))
-                        .triggerableAnim("open_disk", RawAnimation.begin().thenPlay("open_disk"))
-                        .triggerableAnim("close_disk", RawAnimation.begin().thenPlay("close_disk"))
-                        .triggerableAnim("play", RawAnimation.begin().thenPlay("play"))
         );
     }
 
 
     private PlayState predicate(AnimationState<CDPlayerEntity> state) {
-        if (state.getController().getCurrentRawAnimation() == null) {
-            System.out.println("setting up");
-            state.setAnimation(RawAnimation.begin().thenPlay("idle"));
+        if (isTrayOpen()) {
+            if (hasDisc()) {
+                state.setAnimation(RawAnimation.begin().then("open_disk", Animation.LoopType.HOLD_ON_LAST_FRAME));
+            } else {
+                state.setAnimation(RawAnimation.begin().then("open", Animation.LoopType.HOLD_ON_LAST_FRAME));
+            }
+            return PlayState.CONTINUE;
+        } else {
+            if (hasDisc()) {
+                state.setAnimation(RawAnimation.begin().then("close_disk", Animation.LoopType.HOLD_ON_LAST_FRAME));
+            } else {
+                state.setAnimation(RawAnimation.begin().then("close", Animation.LoopType.HOLD_ON_LAST_FRAME));
+            }
+            return PlayState.CONTINUE;
         }
-        return PlayState.CONTINUE;
     }
 
 
@@ -129,6 +123,28 @@ public class CDPlayerEntity extends BlockEntity implements GeoBlockEntity {
     @Override
     public double getTick(Object blockEntity) {
         return RenderUtils.getCurrentTick();
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = super.getUpdateTag();
+        saveAdditional(tag);
+        return tag;
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        handleUpdateTag(pkt.getTag());
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag) {
+        load(tag);
     }
 
 

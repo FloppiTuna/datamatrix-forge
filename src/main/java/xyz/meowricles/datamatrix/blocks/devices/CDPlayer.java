@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +20,7 @@ import xyz.meowricles.datamatrix.items.ModItems;
 
 import javax.annotation.Nullable;
 
-public class CDPlayer extends BaseEntityBlock {
+public class CDPlayer extends Block implements EntityBlock {
     public CDPlayer(Properties props) {
         super(props);
     }
@@ -42,6 +43,7 @@ public class CDPlayer extends BaseEntityBlock {
                     Component.literal("Tray is now " + (blockEntity.isTrayOpen() ? "open" : "closed")),
                     true
             );
+            blockEntity.triggerAnim("controller", (blockEntity.isTrayOpen() ? "open" : "closed"));
             return InteractionResult.SUCCESS;
         }
 
@@ -72,8 +74,6 @@ public class CDPlayer extends BaseEntityBlock {
             }
         } else {
             // tray closed → do something else (play, show msg, etc)
-            blockEntity.playPressed();
-            player.displayClientMessage(Component.literal("CD Player: Play pressed"), true);
         }
 
         return InteractionResult.SUCCESS;

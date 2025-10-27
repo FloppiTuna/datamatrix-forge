@@ -1,6 +1,10 @@
 package xyz.meowricles.datamatrix;
 
 import com.mojang.logging.LogUtils;
+import dan200.computercraft.api.ComputerCraftAPI;
+import dan200.computercraft.api.component.ComputerComponent;
+import li.cil.oc2.api.bus.device.Device;
+import li.cil.oc2.api.bus.device.vm.VMDevice;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.registries.Registries;
@@ -23,11 +27,11 @@ import xyz.meowricles.datamatrix.blocks.ModBlocks;
 import xyz.meowricles.datamatrix.blocks.entity.ModBlockEntities;
 import xyz.meowricles.datamatrix.blocks.entity.client.CDPlayerRenderer;
 import xyz.meowricles.datamatrix.items.ModItems;
+import xyz.meowricles.datamatrix.peripherals.CDPlayerPeripheral;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Datamatrix.MODID)
 public class Datamatrix {
-
     // Define mod id in a common place for everything to reference
     public static final String MODID = "datamatrix";
     // Directly reference a slf4j logger
@@ -62,8 +66,10 @@ public class Datamatrix {
     private void commonSetup(final FMLCommonSetupEvent event) {
         // Some common setup code
         LOGGER.info("common setup time");
+        ComputerCraftAPI.registerGenericSource(new CDPlayerPeripheral());
 
     }
+
 
     // Add the example block item to the building blocks tab
 //    private void addCreative(BuildCreativeModeTabContentsEvent event) {

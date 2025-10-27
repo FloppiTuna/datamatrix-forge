@@ -1,3 +1,9 @@
 {
-  "item.datamatrix.compact_disc": "Compact Disc"
+  "item.datamatrix.compact_disc": "Compact Disc",
+  "item.datamatrix.compact_disc.lore": "A spinny thing! Commonly used for music!",
+
+  "item.datamatrix.mystery_nand": "Mystery NAND",
+  "item.datamatrix.mystery_nand.lore": "A mysterious storage device.",
+
+  "block.datamatrix.cd_player": "CD Player"
 }
