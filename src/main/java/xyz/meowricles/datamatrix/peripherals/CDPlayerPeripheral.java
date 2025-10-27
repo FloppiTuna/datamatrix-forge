@@ -5,7 +5,6 @@ import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.GenericPeripheral;
 import dan200.computercraft.api.peripheral.PeripheralType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import xyz.meowricles.datamatrix.Datamatrix;
 import xyz.meowricles.datamatrix.blocks.entity.CDPlayerEntity;
@@ -16,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 public class CDPlayerPeripheral implements GenericPeripheral {
     @Override
     public String id() {
-        return new ResourceLocation(Datamatrix.MODID, "cd_player").toString();
+        return ResourceLocation.fromNamespaceAndPath(Datamatrix.MODID, "cd_player").toString();
     }
 
     @Override
