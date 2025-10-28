@@ -1,9 +1,12 @@
 {
   "item.datamatrix.compact_disc": "Compact Disc",
-  "item.datamatrix.compact_disc.lore": "A spinny thing! Commonly used for music!",
+  "item.datamatrix.compact_disc.lore": "A spinny thing! Most commonly used for music.",
 
   "item.datamatrix.mystery_nand": "Mystery NAND",
   "item.datamatrix.mystery_nand.lore": "A mysterious storage device.",
+
+  "item.datamatrix.polycarbonate_blob": "Polycarbonate Blob",
+  "item.datamatrix.polycarbonate_blob.lore": "A blob of polycarbonate, used in the manufacturing of CDs.",
 
   "block.datamatrix.cd_player": "CD Player"
 }
