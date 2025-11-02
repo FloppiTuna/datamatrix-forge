@@ -8,10 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -20,7 +17,7 @@ import xyz.meowricles.datamatrix.items.ModItems;
 
 import javax.annotation.Nullable;
 
-public class CDPlayer extends Block implements EntityBlock {
+public class CDPlayer extends DirectionalBlock implements EntityBlock {
     public CDPlayer(Properties props) {
         super(props);
     }
@@ -43,7 +40,6 @@ public class CDPlayer extends Block implements EntityBlock {
                     Component.literal("Tray is now " + (blockEntity.isTrayOpen() ? "open" : "closed")),
                     true
             );
-            blockEntity.triggerAnim("controller", (blockEntity.isTrayOpen() ? "open" : "closed"));
             return InteractionResult.SUCCESS;
         }
 

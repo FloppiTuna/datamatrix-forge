@@ -62,6 +62,43 @@ public class StorageMediumBase extends Item implements IStorageMedium {
         return capacity;
     }
 
+    /* ---------- Burn/read-only management ---------- */
+
+    /** Check NBT burned flag */
+    public boolean isBurned(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        CompoundTag tag = stack.getOrCreateTag();
+        return tag.contains("burned") && tag.getBoolean("burned");
+    }
+
+    /** Set burned flag in NBT */
+    public void setBurned(ItemStack stack, boolean burned) {
+        if (stack == null || stack.isEmpty()) return;
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.putBoolean("burned", burned);
+    }
+
+    /**
+     * Burn/finalize the medium:
+     * - mark NBT burned=true
+     * - attempt to set the backing file read-only as an OS-level guard
+     * After this method completes, further write(...) calls will be rejected by code.
+     */
+    public void burn(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return;
+        if (isBurned(stack)) return; // already burned
+
+        setBurned(stack, true);
+
+        // Best-effort: try to set file read-only on filesystem
+        File f = getFile(stack);
+        try {
+            f.setReadOnly();
+        } catch (Exception ignored) {
+            // ignore; we still enforce via NBT flags in code
+        }
+    }
+
     @Override
     public byte[] read(ItemStack stack, int offset, int length) {
         try (RandomAccessFile raf = new RandomAccessFile(getFile(stack), "r")) {
@@ -77,6 +114,20 @@ public class StorageMediumBase extends Item implements IStorageMedium {
 
     @Override
     public void write(ItemStack stack, int offset, byte[] data) {
+        // enforce burned = read-only
+        if (isBurned(stack)) {
+            // either silently ignore, throw, or log — choose what fits your UX.
+            // Throwing will propagate an exception to caller; many mods prefer no throw.
+            throw new IllegalStateException("Cannot write to finalized media");
+        }
+
+        // enforce capacity guard
+        if (offset < 0) throw new IllegalArgumentException("Attempted to access negative offset (" + offset + ")");
+        long endPos = (long) offset + data.length;
+        if (endPos > capacity) {
+            throw new IllegalArgumentException("Write would exceed capacity: " + endPos + " > " + capacity);
+        }
+
         try (RandomAccessFile raf = new RandomAccessFile(getFile(stack), "rw")) {
             raf.seek(offset);
             raf.write(data);

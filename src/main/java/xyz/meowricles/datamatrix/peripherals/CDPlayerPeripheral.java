@@ -30,6 +30,22 @@ public class CDPlayerPeripheral implements GenericPeripheral {
     }
 
     @LuaFunction(mainThread = true)
+    public boolean isFinalized(CDPlayerEntity player) {
+        ItemStack stack = player.getDisc();
+        CompactDiscItem disc = (CompactDiscItem) stack.getItem();
+
+        return disc.isDiscBurned(stack);
+    }
+
+    @LuaFunction(mainThread = true)
+    public void finalizeDisc(CDPlayerEntity player) {
+        ItemStack stack = player.getDisc();
+        CompactDiscItem disc = (CompactDiscItem) stack.getItem();
+
+        disc.burnDisc(stack);
+    }
+
+    @LuaFunction(mainThread = true)
     public boolean isTrayOpen(CDPlayerEntity player) {
         return player.isTrayOpen();
     }
