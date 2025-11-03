@@ -27,23 +27,33 @@ public class CompactDiscItem extends StorageMediumBase {
     }
 
     @Override
+    public Component getName(ItemStack stack) {
+        String label = getLabel(stack);
+        return label.isEmpty() ? super.getName(stack) : Component.literal(label).withStyle(ChatFormatting.ITALIC);
+    }
+
+
+
+    public String getLabel(ItemStack stack) {
+        byte[] labelLengthBytes = ((CompactDiscItem) stack.getItem()).read(stack, 10, 1);
+        int labelLength = (labelLengthBytes.length > 0) ? labelLengthBytes[0] : 0;
+
+        byte[] labelBytes = ((CompactDiscItem) stack.getItem()).read(stack, 12, labelLength);
+
+        return new String(labelBytes).trim();
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
 
         boolean burned = isDiscBurned(stack);
 
-        byte[] labelLengthBytes = ((CompactDiscItem) stack.getItem()).read(stack, 10, 1);
-        int labelLength = (labelLengthBytes.length > 0) ? labelLengthBytes[0] : 0;
-
-        byte[] labelBytes =  ((CompactDiscItem) stack.getItem()).read(stack, 12, labelLength);
-        String label = new String(labelBytes).trim();
+        String label = getLabel(stack);
 
         if (burned) {
             tooltip.add(
                     Component.literal("Burned").withStyle(ChatFormatting.GREEN)
-            );
-            tooltip.add(
-                    Component.literal(label).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GOLD)
             );
         } else {
             tooltip.add(
