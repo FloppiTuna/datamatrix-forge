@@ -1,8 +1,14 @@
 package xyz.meowricles.datamatrix.items.media;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+import xyz.meowricles.datamatrix.utils.FileSizePrettier;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +16,7 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -27,6 +34,17 @@ public class StorageMediumBase extends Item implements IStorageMedium {
         } catch (IOException e) {
             throw new RuntimeException("Failed to create storage folder", e);
         }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+
+        int used = getUsed(stack);
+        int capacity = getCapacity();
+
+        tooltip.add(Component.literal(String.format("Used: %s / %s", FileSizePrettier.humanReadableByteCountSI(used), FileSizePrettier.humanReadableByteCountSI(capacity)))
+                .withStyle(ChatFormatting.DARK_GRAY));
     }
 
     /** Ensures this ItemStack has a storage_id in its NBT */

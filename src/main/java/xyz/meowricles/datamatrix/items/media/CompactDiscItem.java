@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import xyz.meowricles.datamatrix.utils.FileSizePrettier;
 
 import java.util.List;
 
@@ -30,8 +31,6 @@ public class CompactDiscItem extends StorageMediumBase {
         super.appendHoverText(stack, level, tooltip, flag);
 
         boolean burned = isDiscBurned(stack);
-        int used = getUsed(stack);
-        int capacity = getCapacity();
 
         byte[] labelLengthBytes = ((CompactDiscItem) stack.getItem()).read(stack, 10, 1);
         int labelLength = (labelLengthBytes.length > 0) ? labelLengthBytes[0] : 0;
@@ -51,8 +50,5 @@ public class CompactDiscItem extends StorageMediumBase {
                     Component.literal("Blank").withStyle(ChatFormatting.GRAY)
             );
         }
-
-        tooltip.add(Component.literal(String.format("Used: %d / %d bytes", used, capacity))
-                .withStyle(ChatFormatting.DARK_GRAY));
     }
 }
