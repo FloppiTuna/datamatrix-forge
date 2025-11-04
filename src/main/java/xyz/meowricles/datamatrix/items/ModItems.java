@@ -1,5 +1,8 @@
 package xyz.meowricles.datamatrix.items;
 
+import guideme.Guide;
+import guideme.Guides;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -13,6 +16,10 @@ import xyz.meowricles.datamatrix.items.media.MysteryNandItem;
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, Datamatrix.MODID);
+
+    // Guidebook
+//    public static final RegistryObject<Item> GUIDEBOOK =
+//            ITEMS.register("guidebook", () -> Guides.createGuideItem(ResourceLocation.fromNamespaceAndPath(Datamatrix.MODID, "guidebook")).getItem());
 
     // Ingredients
     public static final RegistryObject<Item> POLYCARBONATE_BLOB =

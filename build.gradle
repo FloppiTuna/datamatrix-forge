@@ -83,7 +83,6 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
-
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -164,9 +163,12 @@ dependencies {
     implementation fg.deobf("curse.maven:markdownmanual-${markdownmanual_project_id}:${markdownmanual_file_id}")
     implementation fg.deobf("curse.maven:oc2r-${oc2r_project_id}:${oc2r_file_id}")
 
-    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:$cctVersion")
+    compileOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:$cctVersion"))
     compileOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:$cctVersion"))
     runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:$cctVersion"))
+
+    compileOnly fg.deobf('org.appliedenergistics:guideme:20.1.7:api')
+    runtimeOnly fg.deobf('org.appliedenergistics:guideme:20.1.7')
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")

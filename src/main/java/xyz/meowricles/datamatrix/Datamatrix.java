@@ -2,8 +2,11 @@ package xyz.meowricles.datamatrix;
 
 import com.mojang.logging.LogUtils;
 import dan200.computercraft.api.ComputerCraftAPI;
+import guideme.Guide;
+import guideme.GuideBuilder;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -58,6 +61,9 @@ public class Datamatrix {
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        // guideme time yay
+        Guide guide = Guide.builder(ResourceLocation.fromNamespaceAndPath(MODID, "guide")).build();
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
